@@ -4,7 +4,7 @@ from database import SessionLocal
 from schemas import PostCreate
 from security import get_current_user
 import crud
-from schemas import PostResponse
+from schemas import PostResponse,PostResponseLikes
 router = APIRouter()
 
 
@@ -20,9 +20,22 @@ def get_db():
 def create_post(post:PostCreate, db:Session = Depends(get_db), current_user  = Depends(get_current_user)):
     return crud.create_post(db,post.title,post.content,current_user.id)
 
-@router.get("/posts",response_model = list[PostResponse])
+@router.get("/posts",response_model = list[PostResponseLikes])
 def get_posts(db:Session = Depends(get_db), current_user = Depends(get_current_user)):
-    return crud.get_posts_by_user(db,current_user.id)
+    posts = crud.get_posts_by_user(db,current_user.id)
+    result=[]
+    for post in posts:
+        like = crud.get_like(db,current_user.id,post.id)
+        likes_count = crud.get_likes_count(db,post.id)
+        result.append({
+            "id":post.id,
+            "title":post.title,
+            "content":post.content,
+            "user_id":post.user_id,
+            "is_liked":bool(like),
+            "likes_count":likes_count,
+        })
+    return result
 
 @router.get("/posts/{post_id}",response_model = PostResponse)
 def get_post(post_id:int,db:Session = Depends(get_db), current_user = Depends(get_current_user)):

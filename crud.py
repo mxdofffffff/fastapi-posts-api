@@ -49,4 +49,10 @@ def delete_like(db:Session, like:Like):
     db.commit()
 
 
+def get_likes_count(db:Session,post_id:int):
+    return db.query(Like).filter(Like.post_id == post_id).count()
+
+
+
+
 

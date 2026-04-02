@@ -22,3 +22,13 @@ class PostResponse(BaseModel):
     user_id: int
     class Config:
         from_attributes = True
+
+class PostResponseLikes(BaseModel):
+    id:int
+    title: str
+    content: str
+    user_id: int
+    is_liked: bool
+    likes_count: int
+    class Config:
+        from_attributes = True

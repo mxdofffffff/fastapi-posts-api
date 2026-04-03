@@ -1,4 +1,4 @@
-
+from sqlalchemy import desc ,func
 from sqlalchemy.orm import Session
 from models import User, Post, Like
 
@@ -20,8 +20,27 @@ def create_post(db:Session, title:str, content:str, user_id:int):
     db.refresh(db_post)
     return db_post
 
-def get_posts_by_user(db:Session, user_id:int):
-    return db.query(Post).filter(Post.user_id == user_id).all()
+def get_posts_by_user(db:Session, user_id:int, limit: int = 10,skip: int = 0,sort:str = None):
+    query = db.query(Post)
+
+    if sort == "likes":
+        query = (
+            query
+            .outerjoin(Like,Like.post_id==Post.id)
+            .group_by(Post.id)
+            .order_by(desc(func.count(Like.id)))
+        )
+    elif sort == "new":
+        query = (
+            query
+            .order_by(desc(Post.id))
+        )
+    if user_id:
+        query = query.filter(Post.user_id == user_id)
+
+    query = query.offset(skip).limit(limit)
+    return query.all()
+
 
 def get_post(db:Session, post_id:int):
     return db.query(Post).filter(Post.id == post_id).first()

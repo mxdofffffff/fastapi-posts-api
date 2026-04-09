@@ -156,12 +156,22 @@ async def login(message: Message):
         db.commit()
         await message.answer("Successfully logged in")
 
-
-
     finally:
         db.close()
 
 
+@dp.message(Command("status"))
+async def status(message: Message):
+    db = SessionLocal()
+    try:
+        tg_user = db.query(TGUser).filter(TGUser.telegram_user_id ==message.from_user.id).first()
+        if not tg_user:
+            await message.answer("User not found in database")
+            return
+        username = tg_user.user.username
+        await message.answer(f"You logged as '{username}'")
+    finally:
+        db.close()
 
 
 @dp.message(Command("my"))

@@ -6,6 +6,7 @@ from security import get_current_user
 import crud
 from schemas import PostResponse,PostResponseLikes
 router = APIRouter()
+from models import Post
 
 
 def get_db():
@@ -53,6 +54,11 @@ def my_posts(db:Session = Depends(get_db), current_user = Depends(get_current_us
             "likes_count":likes_count,
         })
     return result
+
+@router.get("/public-posts")
+def public_posts(db:Session = Depends(get_db)):
+    posts = db.query(Post).all()
+    return posts
 
 @router.get("/posts/{post_id}",response_model = PostResponse)
 def get_post(post_id:int,db:Session = Depends(get_db), current_user = Depends(get_current_user)):

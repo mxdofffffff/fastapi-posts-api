@@ -22,6 +22,7 @@ def register(user:UserCreate,db:Session = Depends(get_db)):
     new_user = crud.create_user(db,user.username,hashed_password)
     return new_user
 
+
 @router.post("/token")
 def login(form_data:OAuth2PasswordRequestForm = Depends(), db:Session = Depends(get_db)):
     user = crud.get_user_by_username(db, username=form_data.username)

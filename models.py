@@ -5,10 +5,11 @@ from sqlalchemy.orm import relationship
 class User(Base):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
-    username = Column(String, unique=True)
-    password = Column(String)
+    username = Column(String, unique=True , nullable=False)
+    password = Column(String,nullable=False)
     posts = relationship("Post", back_populates="owner")
     likes = relationship("Like", back_populates="user")
+    tg_users = relationship("TGUser", back_populates="user")
 
 class Post(Base):
     __tablename__ = 'posts'
@@ -26,4 +27,11 @@ class Like(Base):
     post_id = Column(Integer,ForeignKey("posts.id"))
     user = relationship("User", back_populates="likes")
     post = relationship("Post", back_populates="likes")
+
+class TGUser(Base):
+    __tablename__ = 'tg_users'
+    telegram_user_id = Column(Integer,primary_key=True)
+    user_id = Column(Integer,ForeignKey("users.id"))
+    user = relationship("User", back_populates="tg_users")
+
 
